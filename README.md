@@ -15,6 +15,8 @@ flowchart LR
 
 `apps/web` — интерфейс Next.js App Router. `services/worker` — FastAPI API и CLI синхронизации. SQLAlchemy используется в Python, чтобы вся обработка и модель данных находились рядом. Синхронизация использует API `resources/public`, не HTML-страницу.
 
+Контейнер `scheduler` выполняет синхронизацию сразу после старта и далее через `SYNC_INTERVAL_HOURS`; значение по умолчанию — 24 часа.
+
 ## Запуск
 
 ```bash
