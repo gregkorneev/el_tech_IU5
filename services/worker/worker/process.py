@@ -6,6 +6,7 @@ from sqlalchemy import delete, select
 
 from .db import Base, engine, session_scope
 from .extract import chunks, extract
+from .analyze import analyze
 from .models import DocumentChunk, ProcessingStatus, SourceFile
 
 log = logging.getLogger("elteh.process")
@@ -19,6 +20,7 @@ def process_one(source: SourceFile, db) -> None:
     db.execute(delete(DocumentChunk).where(DocumentChunk.source_file_id == source.id))
     db.add_all(DocumentChunk(source_file_id=source.id, ordinal=index, text=part.text, page=part.page, slide=part.slide) for index, part in enumerate(parts))
     source.extracted_text = "\n\n".join(part.text for part in parts)
+    analyze(source, db)
     source.status = ProcessingStatus.READY
 
 

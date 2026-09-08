@@ -1,3 +1,4 @@
+import json
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
@@ -5,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import or_, select
 
 from .db import Base, engine, session_scope
-from .models import Course, SourceFile
+from .models import Course, MaterialSummary, SourceFile
 from .sync import sync
 
 
@@ -50,7 +51,8 @@ def material(file_id: int):
     with session_scope() as db:
         item = db.get(SourceFile, file_id)
         if not item: raise HTTPException(404, "Материал не найден")
-        return serialize(item) | {"text": item.extracted_text}
+        summary = db.scalar(select(MaterialSummary).where(MaterialSummary.source_file_id == item.id))
+        return serialize(item) | {"text": item.extracted_text, "summary": None if not summary else {"short": summary.short_summary, "detail": summary.detail, "topics": json.loads(summary.topics_json), "formulas": json.loads(summary.formulas_json)}}
 
 
 @app.post("/admin/sync")

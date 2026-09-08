@@ -1,6 +1,7 @@
 from worker.sync import file_status, fingerprint, normalized_path
 from worker.models import ProcessingStatus
 from worker.extract import ExtractedPart, chunks
+from worker.providers import LocalSummaryProvider
 
 
 def test_path_is_normalized():
@@ -20,3 +21,9 @@ def test_chunking_preserves_page():
     parts = chunks([ExtractedPart("one two three four", page=4)], max_chars=7)
     assert all(part.page == 4 for part in parts)
     assert " ".join(part.text for part in parts) == "one two three four"
+
+
+def test_local_summary_returns_valid_structure():
+    result = LocalSummaryProvider().summarize("Лекция", ["Первый закон Кирхгофа описывает токи в узле. Второй закон описывает контуры."])
+    assert result.title == "Лекция"
+    assert result.short_summary

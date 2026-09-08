@@ -49,3 +49,15 @@ class DocumentChunk(Base):
     text: Mapped[str] = mapped_column(Text)
     page: Mapped[int | None] = mapped_column(Integer, nullable=True)
     slide: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class MaterialSummary(Base):
+    __tablename__ = "material_summaries"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_file_id: Mapped[int] = mapped_column(ForeignKey("source_files.id"), unique=True, index=True)
+    title: Mapped[str] = mapped_column(String(512))
+    short_summary: Mapped[str] = mapped_column(Text)
+    detail: Mapped[str] = mapped_column(Text)
+    topics_json: Mapped[str] = mapped_column(Text, default="[]")
+    definitions_json: Mapped[str] = mapped_column(Text, default="[]")
+    formulas_json: Mapped[str] = mapped_column(Text, default="[]")
