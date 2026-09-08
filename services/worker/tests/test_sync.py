@@ -30,6 +30,11 @@ def test_local_summary_returns_valid_structure():
     assert result.short_summary
 
 
+def test_local_summary_limits_unpunctuated_transcript_excerpt():
+    result = LocalSummaryProvider().summarize("Лекция", ["слово " * 200])
+    assert len(result.short_summary) <= 240
+
+
 def test_recording_formats_and_timestamps_are_supported():
     assert "mp4" in AUDIO_EXTENSIONS
     assert TranscriptPart(12.4, 15.0, "Текст").end == 15.0

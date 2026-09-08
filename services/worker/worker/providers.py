@@ -25,6 +25,9 @@ class LocalSummaryProvider:
     def summarize(self, title: str, chunks: list[str]) -> SummaryResult:
         text = " ".join(chunks).strip()
         sentences = [sentence.strip() for sentence in re.split(r"(?<=[.!?])\s+", text) if len(sentence.strip()) > 20]
+        if not sentences:
+            sentences = [text]
+        sentences = [sentence[:240].rsplit(" ", 1)[0] or sentence[:240] for sentence in sentences]
         summary = " ".join(sentences[:3]) or "Текст извлечён; автоматическое краткое описание пока недоступно."
         headings = re.findall(r"(?:^|\n)\s*(?:\d+[.)]|#{1,3})\s*([^\n]{3,90})", text)
         topics = list(dict.fromkeys(item.strip(" .") for item in headings))[:12]
