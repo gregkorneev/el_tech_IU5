@@ -19,8 +19,16 @@ app = FastAPI(title="Электротехника knowledge API", lifespan=lifes
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_methods=["GET", "POST"], allow_headers=["*"])
 
 
+def category(item: SourceFile) -> str:
+    text = f"{item.path} {item.name}".lower()
+    if any(word in text for word in ("лекц", "lecture")): return "lectures"
+    if any(word in text for word in ("лаб", "laboratory", "lab")): return "labs"
+    if any(word in text for word in ("запис", "recording", "record")): return "recordings"
+    return "materials"
+
+
 def serialize(item: SourceFile):
-    return {"id": item.id, "name": item.name, "path": item.path, "type": (item.name.rsplit(".", 1)[-1] if "." in item.name else "file").upper(), "status": item.status, "modifiedAt": item.modified_at, "originalUrl": item.original_url, "excerpt": (item.extracted_text or "").replace("\n", " ")[:180]}
+    return {"id": item.id, "name": item.name, "path": item.path, "type": (item.name.rsplit(".", 1)[-1] if "." in item.name else "file").upper(), "status": item.status, "category": category(item), "modifiedAt": item.modified_at, "originalUrl": item.original_url, "excerpt": (item.extracted_text or "").replace("\n", " ")[:180]}
 
 
 @app.get("/health")
@@ -28,12 +36,13 @@ def health(): return {"ok": True}
 
 
 @app.get("/materials")
-def materials(q: str = "", status: str | None = None):
+def materials(q: str = "", status: str | None = None, category: str | None = None):
     with session_scope() as db:
         stmt = select(SourceFile).order_by(SourceFile.modified_at.desc())
         if q: stmt = stmt.where(or_(SourceFile.name.ilike(f"%{q}%"), SourceFile.extracted_text.ilike(f"%{q}%")))
         if status: stmt = stmt.where(SourceFile.status == status)
-        return [serialize(row) for row in db.scalars(stmt)]
+        rows = (serialize(row) for row in db.scalars(stmt))
+        return [row for row in rows if category is None or row["category"] == category]
 
 
 @app.get("/materials/{file_id}")

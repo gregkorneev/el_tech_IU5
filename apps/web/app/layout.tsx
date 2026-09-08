@@ -1,4 +1,5 @@
 import "./styles.css";
+import "./library.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Электротехника 2026/27", description: "База знаний курса" };
