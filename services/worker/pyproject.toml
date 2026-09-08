@@ -2,7 +2,7 @@
 name = "elteh-worker"
 version = "0.1.0"
 requires-python = ">=3.11"
-dependencies = ["fastapi>=0.115", "uvicorn[standard]>=0.30", "sqlalchemy>=2.0", "psycopg[binary]>=3.2", "requests>=2.32", "pydantic-settings>=2.6"]
+dependencies = ["fastapi>=0.115", "uvicorn[standard]>=0.30", "sqlalchemy>=2.0", "psycopg[binary]>=3.2", "requests>=2.32", "pydantic-settings>=2.6", "pypdf>=5.0", "python-docx>=1.1", "python-pptx>=1.0", "openpyxl>=3.1"]
 
 [build-system]
 requires = ["setuptools>=68"]

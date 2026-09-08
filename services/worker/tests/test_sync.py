@@ -1,5 +1,6 @@
 from worker.sync import file_status, fingerprint, normalized_path
 from worker.models import ProcessingStatus
+from worker.extract import ExtractedPart, chunks
 
 
 def test_path_is_normalized():
@@ -13,3 +14,9 @@ def test_fingerprint_detects_change():
 
 def test_unsupported_does_not_fail():
     assert file_status("archive.zip") == ProcessingStatus.UNSUPPORTED
+
+
+def test_chunking_preserves_page():
+    parts = chunks([ExtractedPart("one two three four", page=4)], max_chars=7)
+    assert all(part.page == 4 for part in parts)
+    assert " ".join(part.text for part in parts) == "one two three four"

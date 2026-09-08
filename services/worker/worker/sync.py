@@ -54,10 +54,10 @@ def sync(full: bool = False, items=None) -> dict[str, int]:
             path = normalized_path(item["path"]); seen.add(path); digest = fingerprint(item)
             source = db.scalar(select(SourceFile).where(SourceFile.course_id == course.id, SourceFile.path == path))
             if not source:
-                db.add(SourceFile(course_id=course.id, path=path, name=item["name"], media_type=item.get("mime_type"), size=item.get("size", 0), modified_at=_date(item.get("modified")), original_url=item.get("public_url"), fingerprint=digest, status=file_status(item["name"])))
+                db.add(SourceFile(course_id=course.id, path=path, name=item["name"], media_type=item.get("mime_type"), size=item.get("size", 0), modified_at=_date(item.get("modified")), original_url=item.get("public_url") or settings.yandex_public_key, download_url=item.get("file"), fingerprint=digest, status=file_status(item["name"])))
                 counts["new"] += 1
             elif full or source.fingerprint != digest:
-                source.name, source.media_type, source.size, source.modified_at, source.original_url, source.fingerprint = item["name"], item.get("mime_type"), item.get("size", 0), _date(item.get("modified")), item.get("public_url"), digest
+                source.name, source.media_type, source.size, source.modified_at, source.original_url, source.download_url, source.fingerprint = item["name"], item.get("mime_type"), item.get("size", 0), _date(item.get("modified")), item.get("public_url") or settings.yandex_public_key, item.get("file"), digest
                 source.status = file_status(source.name); counts["modified"] += 1
             else:
                 counts["unchanged"] += 1

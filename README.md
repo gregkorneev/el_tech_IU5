@@ -27,13 +27,14 @@ docker compose up --build
 ```bash
 docker compose exec worker python -m worker.sync
 docker compose exec worker python -m worker.sync --full
+docker compose exec worker python -m worker.process
 ```
 
 ## Pipeline
 
 Синхронизатор создаёт курс, обходит дерево публичного ресурса, нормализует пути и сравнивает устойчивый fingerprint (`path`, размер, дата изменения). Новые и изменённые файлы ставятся в `queued`, удалённые отмечаются как `removed`; неизменённые не обрабатываются повторно. Неподдерживаемые расширения получают `unsupported` без остановки запуска.
 
-Следующий этап добавляет extractors для PDF/DOCX/PPTX/XLSX и транскрибацию через ffmpeg/STT-provider. Провайдеры AI будут изолированы интерфейсами, а ключи останутся только в окружении.
+`worker.process` временно скачивает поставленные в очередь текстовые документы, извлекает page- или slide-aware chunks для PDF/DOCX/PPTX/XLSX/TXT/Markdown, сохраняет только результат и отмечает исходник как готовый. Видео и аудио остаются в очереди для отдельного этапа с ffmpeg/STT-provider. Ключи AI будут только в окружении.
 
 ## Разработка и тесты
 
