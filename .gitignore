@@ -1,0 +1,8 @@
+.env
+.next/
+node_modules/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.sqlite3
+data/

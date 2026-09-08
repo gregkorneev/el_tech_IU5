@@ -1,0 +1,3 @@
+import { Shell } from "../components";
+const names: Record<string, string> = { lectures: "Лекции", labs: "Лабораторные", recordings: "Записи занятий", topics: "Темы", updates: "Обновления" };
+export default async function Section({ params }: {params: Promise<{section: string}>}) { const {section} = await params; const title = names[section] ?? "Материалы"; return <Shell><section className="page-head"><p className="eyebrow">Электротехника 2026/27</p><h1>{title}</h1><p>Этот раздел начнёт наполняться после обработки материалов. Структура готова для связанных конспектов, источников и навигации по темам.</p></section><div className="empty"><h2>Раздел ожидает данные</h2><p>Синхронизируйте папку Яндекс.Диска, чтобы создать первые страницы.</p></div></Shell>; }

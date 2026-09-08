@@ -1,0 +1,45 @@
+# Электротехника 2026/27
+
+Веб-база знаний, синхронизирующая публичную папку Яндекс.Диска с каталогом учебных материалов. Большие оригиналы остаются на Диске; PostgreSQL хранит метаданные, извлечённый текст и результаты обработки.
+
+## Архитектура
+
+```mermaid
+flowchart LR
+  D[Публичная папка Яндекс.Диска] -->|официальный API| W[Python worker / FastAPI]
+  W --> P[(PostgreSQL)]
+  W -->|временная загрузка| X[Extractors / AI providers]
+  N[Next.js portal] -->|REST| W
+  N --> P
+```
+
+`apps/web` — интерфейс Next.js App Router. `services/worker` — FastAPI API и CLI синхронизации. SQLAlchemy используется в Python, чтобы вся обработка и модель данных находились рядом. Синхронизация использует API `resources/public`, не HTML-страницу.
+
+## Запуск
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Откройте http://localhost:3000. Для ручной синхронизации:
+
+```bash
+docker compose exec worker python -m worker.sync
+docker compose exec worker python -m worker.sync --full
+```
+
+## Pipeline
+
+Синхронизатор создаёт курс, обходит дерево публичного ресурса, нормализует пути и сравнивает устойчивый fingerprint (`path`, размер, дата изменения). Новые и изменённые файлы ставятся в `queued`, удалённые отмечаются как `removed`; неизменённые не обрабатываются повторно. Неподдерживаемые расширения получают `unsupported` без остановки запуска.
+
+Следующий этап добавляет extractors для PDF/DOCX/PPTX/XLSX и транскрибацию через ffmpeg/STT-provider. Провайдеры AI будут изолированы интерфейсами, а ключи останутся только в окружении.
+
+## Разработка и тесты
+
+```bash
+cd services/worker && pip install -e '.[dev]' && pytest
+cd apps/web && npm install && npm run dev
+```
+
+Миграции на старте выполняются через `Base.metadata.create_all`; перед production заменим это на Alembic, когда схема стабилизируется.
