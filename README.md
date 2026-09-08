@@ -28,6 +28,7 @@ docker compose up --build
 docker compose exec worker python -m worker.sync
 docker compose exec worker python -m worker.sync --full
 docker compose exec worker python -m worker.process
+docker compose exec worker python -m worker.transcribe
 ```
 
 ## Pipeline

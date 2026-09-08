@@ -2,6 +2,7 @@ from worker.sync import file_status, fingerprint, normalized_path
 from worker.models import ProcessingStatus
 from worker.extract import ExtractedPart, chunks
 from worker.providers import LocalSummaryProvider
+from worker.transcribe import AUDIO_EXTENSIONS, TranscriptPart
 
 
 def test_path_is_normalized():
@@ -27,3 +28,8 @@ def test_local_summary_returns_valid_structure():
     result = LocalSummaryProvider().summarize("Лекция", ["Первый закон Кирхгофа описывает токи в узле. Второй закон описывает контуры."])
     assert result.title == "Лекция"
     assert result.short_summary
+
+
+def test_recording_formats_and_timestamps_are_supported():
+    assert "mp4" in AUDIO_EXTENSIONS
+    assert TranscriptPart(12.4, 15.0, "Текст").end == 15.0

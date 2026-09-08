@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import or_, select
 
 from .db import Base, engine, session_scope
-from .models import Course, MaterialSummary, SourceFile
+from .models import Course, MaterialSummary, SourceFile, TranscriptSegment
 from .sync import sync
 
 
@@ -52,7 +52,8 @@ def material(file_id: int):
         item = db.get(SourceFile, file_id)
         if not item: raise HTTPException(404, "Материал не найден")
         summary = db.scalar(select(MaterialSummary).where(MaterialSummary.source_file_id == item.id))
-        return serialize(item) | {"text": item.extracted_text, "summary": None if not summary else {"short": summary.short_summary, "detail": summary.detail, "topics": json.loads(summary.topics_json), "formulas": json.loads(summary.formulas_json)}}
+        segments = list(db.scalars(select(TranscriptSegment).where(TranscriptSegment.source_file_id == item.id).order_by(TranscriptSegment.ordinal)))
+        return serialize(item) | {"text": item.extracted_text, "summary": None if not summary else {"short": summary.short_summary, "detail": summary.detail, "topics": json.loads(summary.topics_json), "formulas": json.loads(summary.formulas_json)}, "transcript": [{"start": segment.start_seconds, "end": segment.end_seconds, "text": segment.text} for segment in segments]}
 
 
 @app.post("/admin/sync")

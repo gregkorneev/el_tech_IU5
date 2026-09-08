@@ -10,6 +10,10 @@ from .db import Base
 class ProcessingStatus(StrEnum):
     DISCOVERED = "discovered"
     QUEUED = "queued"
+    DOWNLOADING = "downloading"
+    EXTRACTING = "extracting"
+    TRANSCRIBING = "transcribing"
+    PROCESSING = "processing"
     READY = "ready"
     FAILED = "failed"
     UNSUPPORTED = "unsupported"
@@ -61,3 +65,13 @@ class MaterialSummary(Base):
     topics_json: Mapped[str] = mapped_column(Text, default="[]")
     definitions_json: Mapped[str] = mapped_column(Text, default="[]")
     formulas_json: Mapped[str] = mapped_column(Text, default="[]")
+
+
+class TranscriptSegment(Base):
+    __tablename__ = "transcript_segments"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_file_id: Mapped[int] = mapped_column(ForeignKey("source_files.id"), index=True)
+    ordinal: Mapped[int] = mapped_column(Integer)
+    start_seconds: Mapped[float] = mapped_column()
+    end_seconds: Mapped[float] = mapped_column()
+    text: Mapped[str] = mapped_column(Text)
