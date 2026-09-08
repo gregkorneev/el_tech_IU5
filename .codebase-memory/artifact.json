@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "420e6eda8d11d0364a5a85302de0695ea9eaafd2",
-    "indexed_at": "2026-09-08T12:56:04Z",
+    "commit": "652f613bab077560616961c75c109e57e510d40a",
+    "indexed_at": "2026-09-08T13:16:28Z",
     "project": "el_tech_IU5",
-    "nodes": 186,
-    "edges": 575,
+    "nodes": 200,
+    "edges": 623,
     "original_size": 2228224,
-    "compressed_size": 222385,
+    "compressed_size": 237585,
     "compression_level": 3
 }
